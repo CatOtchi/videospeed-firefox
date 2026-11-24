@@ -241,7 +241,7 @@ export default async function runSettingsBoundaryE2ETests() {
       const ask = (lastSpeed) =>
         page.evaluate((speed) => {
           document.documentElement.dispatchEvent(
-            new CustomEvent('VSC_WRITE_STORAGE', { detail: { lastSpeed: speed } })
+            new CustomEvent('VSC_WRITE_STORAGE', { detail: speed })
           );
         }, lastSpeed);
 

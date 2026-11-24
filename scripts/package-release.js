@@ -11,9 +11,13 @@ const rootDir = path.resolve(__dirname, '..');
 const require = createRequire(import.meta.url);
 const pkg = require(path.join(rootDir, 'package.json'));
 
-const distDir = path.join(rootDir, 'dist');
+const isFirefox = process.argv.includes('--firefox');
+const distName = isFirefox ? 'dist-firefox' : 'dist';
+const distDir = path.join(rootDir, distName);
 const releaseDir = path.join(rootDir, 'release');
-const zipName = `videospeed-${pkg.version}.zip`;
+const zipName = isFirefox
+  ? `videospeed-gecko-${pkg.version}.xpi`
+  : `videospeed-${pkg.version}.zip`;
 const zipPath = path.join(releaseDir, zipName);
 
 const CWS_SIZE_LIMIT = 128 * 1024 * 1024; // 128 MB
@@ -21,7 +25,8 @@ const CWS_SIZE_LIMIT = 128 * 1024 * 1024; // 128 MB
 async function packageRelease() {
   // Verify dist exists
   if (!(await fs.pathExists(distDir))) {
-    console.error('❌ dist/ directory not found. Run "npm run build:release" first.');
+    const buildCommand = isFirefox ? 'npm run build:firefox' : 'npm run build:release';
+    console.error(`❌ ${distName}/ directory not found. Run "${buildCommand}" first.`);
     process.exit(1);
   }
 
@@ -60,7 +65,7 @@ async function packageRelease() {
   const stats = await fs.stat(zipPath);
   const sizeMB = (stats.size / (1024 * 1024)).toFixed(2);
 
-  if (stats.size > CWS_SIZE_LIMIT) {
+  if (!isFirefox && stats.size > CWS_SIZE_LIMIT) {
     console.warn(`⚠️  Warning: ${zipName} is ${sizeMB} MB (Chrome Web Store limit is 128 MB)`);
   }
 

@@ -136,9 +136,8 @@ if (!window.VSC.StorageManager) {
       if (keys.length === 1 && keys[0] === 'lastSpeed') {
         const speed = data.lastSpeed;
         if (typeof speed === 'number' && Number.isFinite(speed)) {
-          docEl.dispatchEvent(
-            new CustomEvent('VSC_WRITE_STORAGE', { detail: { lastSpeed: speed } })
-          );
+          // A number can cross Firefox's page-to-extension boundary directly.
+          docEl.dispatchEvent(new CustomEvent('VSC_WRITE_STORAGE', { detail: speed }));
         } else {
           window.VSC.logger?.warn?.('StorageManager.set: invalid lastSpeed value');
         }

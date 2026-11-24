@@ -440,7 +440,7 @@ describe('content-bridge', () => {
       store({ rememberSpeed: true });
       await handshake();
 
-      await requestRemember({ lastSpeed: 2.5 });
+      await requestRemember(2.5);
 
       expect(getMockStorage().lastSpeed).toBe(2.5);
     });
@@ -453,16 +453,16 @@ describe('content-bridge', () => {
       store({ rememberSpeed: true });
       await handshake();
 
-      await requestRemember({ lastSpeed: asked });
+      await requestRemember(asked);
 
       expect(getMockStorage().lastSpeed).toBe(stored);
     });
 
     it.each([
-      ['a word', { lastSpeed: 'fast' }],
-      ['NaN', { lastSpeed: NaN }],
-      ['zero', { lastSpeed: 0 }],
-      ['a negative number', { lastSpeed: -1 }],
+      ['a word', 'fast'],
+      ['NaN', NaN],
+      ['zero', 0],
+      ['a negative number', -1],
       ['another setting', { startHidden: true, rememberSpeed: false }],
       ['nothing', null],
     ])('ignores a request carrying %s', async (_label, detail) => {
@@ -484,7 +484,7 @@ describe('content-bridge', () => {
       docEl.dispatchEvent(
         new CustomEvent('VSC_STORAGE_CHANGED', { detail: { rememberSpeed: { newValue: true } } })
       );
-      await requestRemember({ lastSpeed: 2.5 });
+      await requestRemember(2.5);
 
       expect(set).not.toHaveBeenCalled();
     });
@@ -493,12 +493,12 @@ describe('content-bridge', () => {
       const { onChanged } = await handshake();
 
       onChanged({ rememberSpeed: { newValue: true } }, 'sync');
-      await requestRemember({ lastSpeed: 2.5 });
+      await requestRemember(2.5);
       expect(getMockStorage().lastSpeed).toBe(2.5);
 
       // Removing the key returns the preference to its default: off.
       onChanged({ rememberSpeed: { oldValue: true } }, 'sync');
-      await requestRemember({ lastSpeed: 3 });
+      await requestRemember(3);
       expect(getMockStorage().lastSpeed).toBe(2.5);
     });
 
@@ -507,7 +507,7 @@ describe('content-bridge', () => {
       const set = vi.spyOn(globalThis.chrome.storage.sync, 'set');
       await loadBridge();
 
-      await requestRemember({ lastSpeed: 2.5 });
+      await requestRemember(2.5);
 
       expect(set).not.toHaveBeenCalled();
     });
@@ -518,7 +518,7 @@ describe('content-bridge', () => {
       vi.spyOn(globalThis.chrome.storage.sync, 'set').mockRejectedValue(new Error('QUOTA'));
       await handshake();
 
-      await requestRemember({ lastSpeed: 2.5 });
+      await requestRemember(2.5);
 
       expect(warn).toHaveBeenCalledOnce();
     });
@@ -552,7 +552,7 @@ describe('content-bridge', () => {
       onChanged({ enabled: { oldValue: false, newValue: true } }, 'sync');
       onChanged({ startHidden: { newValue: true } }, 'sync');
       onMessage({ type: 'VSC_RESET_SPEED' });
-      await requestRemember({ lastSpeed: 2.5 });
+      await requestRemember(2.5);
 
       expect(events).toEqual([{ type: 'VSC_MESSAGE', detail: { type: 'VSC_TEARDOWN' } }]);
       expect(set).not.toHaveBeenCalled();

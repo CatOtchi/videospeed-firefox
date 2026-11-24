@@ -112,7 +112,7 @@ describe('StorageManager — MAIN world (CustomEvent paths)', () => {
       await StorageManager.set({ lastSpeed: 2.5 });
 
       expect(dispatched).toHaveBeenCalledOnce();
-      expect(dispatched).toHaveBeenCalledWith({ lastSpeed: 2.5 });
+      expect(dispatched).toHaveBeenCalledWith(2.5);
 
       docEl.removeEventListener('VSC_WRITE_STORAGE', handler);
     });

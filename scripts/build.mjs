@@ -13,13 +13,15 @@ const require = createRequire(import.meta.url);
 const pkg = require(path.join(rootDir, 'package.json'));
 
 const isWatch = process.argv.includes('--watch');
+const isFirefox = process.argv.includes('--firefox');
 const isRelease = process.env.RELEASE === '1';
+const outDir = path.resolve(rootDir, isFirefox ? 'dist-firefox' : 'dist');
 
 const common = {
   bundle: true,
   sourcemap: isRelease ? false : false, // set true locally if debugging
   minify: isRelease,
-  target: 'chrome114',
+  target: isFirefox ? 'firefox140' : 'chrome114',
   platform: 'browser',
   legalComments: 'none',
   format: 'iife', // preserve side-effects and simple global init without ESM runtime
@@ -27,8 +29,6 @@ const common = {
 };
 
 async function copyStaticFiles() {
-  const outDir = path.resolve(rootDir, 'dist');
-
   try {
     // Ensure the output directory exists and is clean
     await fs.emptyDir(outDir);
@@ -36,6 +36,18 @@ async function copyStaticFiles() {
     // Inject version from package.json into manifest
     const manifest = await fs.readJson(path.join(rootDir, 'manifest.json'));
     manifest.version = pkg.version;
+    if (isFirefox) {
+      manifest.name = 'Video Speed Controller Gecko';
+      delete manifest.minimum_chrome_version;
+      manifest.background = { scripts: [manifest.background.service_worker] };
+      manifest.browser_specific_settings = {
+        gecko: {
+          id: 'video-speed-controller-gecko@benja.local',
+          strict_min_version: '140.0',
+          data_collection_permissions: { required: ['none'] }
+        }
+      };
+    }
     await fs.writeJson(path.join(outDir, 'manifest.json'), manifest, { spaces: 2 });
     console.log(`✅ Manifest version set to ${pkg.version}${isRelease ? ' (release)' : ''}`);
 
@@ -77,7 +89,7 @@ async function build() {
         'ui/popup/popup': 'src/ui/popup/popup.js',
         'ui/options/options': 'src/ui/options/options.js'
       },
-      outdir: 'dist',
+      outdir: outDir,
     };
 
     if (isWatch) {

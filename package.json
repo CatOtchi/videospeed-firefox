@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "build:firefox": "node scripts/build.mjs --firefox",
+    "package:firefox": "node scripts/build.mjs --firefox && node scripts/package-release.js --firefox",
     "dev": "node scripts/build.mjs --watch",
     "prebuild": "node scripts/clean.mjs dist",
     "test": "vitest run",
@@ -22,7 +24,7 @@
     "prerelease": "npm run clean && npm run lint && npm test && npm run test:tlc",
     "release": "npm run build:release && node scripts/package-release.js",
     "release:github": "node scripts/github-release.js",
-    "clean": "node scripts/clean.mjs dist release",
+    "clean": "node scripts/clean.mjs dist dist-firefox release",
     "prepare": "husky"
   },
   "lint-staged": {

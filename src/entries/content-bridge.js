@@ -26,7 +26,9 @@ const docEl = document.documentElement;
 let bridgeInitialized = false;
 
 function dispatch(type, detail) {
-  docEl.dispatchEvent(new CustomEvent(type, { detail }));
+  // Firefox isolates extension-owned objects from page scripts.
+  const pageDetail = typeof cloneInto === 'function' ? cloneInto(detail, window) : detail;
+  docEl.dispatchEvent(new CustomEvent(type, { detail: pageDetail }));
 }
 
 function dispatchAbort() {
@@ -155,7 +157,7 @@ function init() {
           return;
         }
 
-        const lastSpeed = normalizeRememberedSpeed(event.detail?.lastSpeed);
+        const lastSpeed = normalizeRememberedSpeed(event.detail);
         if (lastSpeed === null) {
           return;
         }

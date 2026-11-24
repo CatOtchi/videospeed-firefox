@@ -166,7 +166,7 @@ describe('VideoSpeedConfig — MAIN world (runtime settings)', () => {
     await vi.advanceTimersByTimeAsync(config.SAVE_DELAY);
 
     expect(config.settings.lastSpeed).toBe(1.75);
-    expect(requests).toEqual([{ lastSpeed: 1.75 }]);
+    expect(requests).toEqual([1.75]);
     docEl.removeEventListener('VSC_WRITE_STORAGE', onWrite);
   });
 });

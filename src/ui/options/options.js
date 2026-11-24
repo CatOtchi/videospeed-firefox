@@ -1113,7 +1113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   function eventCaller(event, className, funcName) {
-    if (!event.target.classList.contains(className)) {
+    if (!event.target.classList?.contains(className)) {
       return;
     }
     funcName(event);
